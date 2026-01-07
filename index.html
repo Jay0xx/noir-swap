@@ -414,7 +414,7 @@
             parseUnits,
             http,
             encodeFunctionData
-        } from 'https://esm.sh/viem';
+        } from 'https://esm.sh/viem@2.21.55';
 
         const RPC_URL = 'https://rpc.testnet.tempo.xyz';
         const CHAIN_ID = 42429;
@@ -918,40 +918,42 @@
         });
 
 
-        connectBtn.addEventListener('click', connect);
-        quoteBtn.addEventListener('click', getQuote);
-        swapBtn.addEventListener('click', swap);
-        document.getElementById('docsBtn').addEventListener('click', () => {
-            const docs = document.getElementById('docsSection');
-            docs.style.display = 'block';
-            setTimeout(() => docs.scrollIntoView({ behavior: 'smooth', block: 'start' }), 10);
-        });
+        document.addEventListener('DOMContentLoaded', () => {
+            connectBtn.addEventListener('click', connect);
+            quoteBtn.addEventListener('click', getQuote);
+            swapBtn.addEventListener('click', swap);
+            document.getElementById('docsBtn').addEventListener('click', () => {
+                const docs = document.getElementById('docsSection');
+                docs.style.display = 'block';
+                setTimeout(() => docs.scrollIntoView({ behavior: 'smooth', block: 'start' }), 10);
+            });
 
-        document.getElementById('flipTokens').addEventListener('click', () => {
-            const fromVal = fromTokenSelect.value;
-            const toVal = toTokenSelect.value;
-            fromTokenSelect.value = toVal;
-            toTokenSelect.value = fromVal;
-            fetchBalances();
-            updateUIState();
-            autoQuote();
-        });
-
-        maxBtn.addEventListener('click', () => {
-            if (currentFromBalance > 0n) {
-                amountInInput.value = formatUnits(currentFromBalance, DECIMALS);
+            document.getElementById('flipTokens').addEventListener('click', () => {
+                const fromVal = fromTokenSelect.value;
+                const toVal = toTokenSelect.value;
+                fromTokenSelect.value = toVal;
+                toTokenSelect.value = fromVal;
+                fetchBalances();
                 updateUIState();
+                autoQuote();
+            });
+
+            maxBtn.addEventListener('click', () => {
+                if (currentFromBalance > 0n) {
+                    amountInInput.value = formatUnits(currentFromBalance, DECIMALS);
+                    updateUIState();
+                }
+            });
+
+            if (window.ethereum) {
+                window.ethereum.on('accountsChanged', () => window.location.reload());
+                window.ethereum.on('chainChanged', () => window.location.reload());
+            }
+
+            if (window.ethereum && window.ethereum.selectedAddress) {
+                connect();
             }
         });
-
-        if (window.ethereum) {
-            window.ethereum.on('accountsChanged', () => window.location.reload());
-            window.ethereum.on('chainChanged', () => window.location.reload());
-        }
-
-        if (window.ethereum && window.ethereum.selectedAddress) {
-            connect();
-        }
     </script>
 
 </body>

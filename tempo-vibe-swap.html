@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOIR SWAP</title>
+    <style>
+        :root {
+            --bg: #000;
+            --text: #fff;
+            --accent-1: #111;
+            --accent-2: #222;
+            --accent-3: #444;
+            --accent-4: #666;
+            --border: #444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--border);
+            padding: 24px;
+            background: var(--bg);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 1.1rem;
+            letter-spacing: 3px;
+        }
+
+        .btn-connect {
+            background: var(--text);
+            color: var(--bg);
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .btn-connect:hover {
+            opacity: 0.8;
+        }
+
+        .address-display {
+            font-size: 0.8rem;
+            color: var(--accent-4);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--accent-4);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        input,
+        select {
+            width: 100%;
+            background: var(--accent-1);
+            border: 1px solid var(--accent-2);
+            color: var(--text);
+            padding: 12px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--accent-4);
+        }
+
+        /* Remove number spinners */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: none;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+
+        button.main-btn {
+            width: 100%;
+            padding: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 1px solid var(--text);
+            transition: all 0.2s;
+        }
+
+        .btn-quote {
+            background: transparent;
+            color: var(--text);
+        }
+
+        .btn-quote:hover {
+            background: var(--accent-1);
+        }
+
+        .btn-swap {
+            background: var(--text);
+            color: var(--bg);
+        }
+
+        .btn-swap:hover {
+            background: #ccc;
+        }
+
+        #status {
+            margin-top: 24px;
+            padding: 12px;
+            font-size: 0.8rem;
+            border: 1px dashed var(--accent-3);
+            min-height: 40px;
+            word-break: break-all;
+            color: var(--accent-4);
+        }
+
+        .tx-link {
+            color: var(--text);
+            text-decoration: underline;
+            display: block;
+            margin-top: 8px;
+        }
+
+        .quote-result {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #fff;
+        }
+
+        .balance-display {
+            font-size: 0.75rem;
+            color: var(--accent-4);
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .max-btn {
+            color: var(--text);
+            text-decoration: underline;
+            cursor: pointer;
+            margin-left: 8px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+
+        .max-btn:hover {
+            color: var(--accent-4);
+        }
+
+        .input-with-max {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        #amountIn {
+            flex: 1;
+        }
+
+        .swap-divider {
+            display: flex;
+            justify-content: center;
+            margin: -10px 0 10px 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .btn-flip {
+            background: transparent;
+            border: none;
+            color: var(--accent-4);
+            width: auto;
+            height: auto;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            transition: all 0.2s;
+            padding: 4px;
+        }
+
+        .btn-flip:hover {
+            color: var(--text);
+            transform: scale(1.05);
+        }
+
+
+        .footer {
+            margin-top: 32px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--accent-4);
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-docs {
+            background: transparent;
+            color: var(--text);
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 6px 10px;
+            outline: none;
+        }
+
+        .btn-docs:hover {
+            opacity: 0.8;
+        }
+
+        .btn-disconnect {
+            background: transparent;
+            color: var(--accent-4);
+            border: 1px solid var(--accent-4);
+            cursor: pointer;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            margin-left: 8px;
+            line-height: 1;
+        }
+
+        .btn-disconnect:hover {
+            color: var(--text);
+            border-color: var(--text);
+        }
+
+        .docs {
+            margin-top: 24px;
+            font-size: 0.8rem;
+            color: var(--accent-4);
+            line-height: 1.5;
+            border-top: 1px dashed var(--border);
+            padding-top: 16px;
+        }
+
+        .docs h2 {
+            font-size: 0.9rem;
+            color: var(--text);
+            margin-bottom: 12px;
+        }
+
+        .docs ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .docs li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <script>
+            window.onerror = function (msg, url, line) {
+                const statusDiv = document.getElementById('status');
+                if (statusDiv) {
+                    statusDiv.innerHTML = `<span style="color:red">Error: ${msg} (Line ${line})</span>`;
+                    statusDiv.style.borderColor = 'red';
+                }
+                return false;
+            };
+        </script>
+        <header>
+            <h1>NOIR SWAP</h1>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <button id="docsBtn" class="btn-docs">DOCS</button>
+                <div id="wallet-area">
+                    <button class="btn-connect" id="connectBtn">CONNECT</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="input-group">
+            <label>From Token</label>
+            <div class="row">
+                <select id="fromToken">
+                    <option value="0x20c0000000000000000000000000000000000001">αUSD</option>
+                    <option value="0x20c0000000000000000000000000000000000002">βUSD</option>
+                </select>
+                <div class="input-with-max">
+                    <input type="number" id="amountIn" placeholder="0.00" step="0.000001">
+                </div>
+            </div>
+            <div class="balance-display">
+                <span id="fromBalance">Connect wallet to see balance</span>
+                <span id="maxBtn" class="max-btn" style="display: none;">MAX</span>
+            </div>
+        </div>
+
+        <div class="swap-divider">
+            <button id="flipTokens" class="btn-flip">↓</button>
+        </div>
+
+        <div class="input-group">
+            <label>To Token</label>
+            <div class="row">
+                <select id="toToken">
+                    <option value="0x20c0000000000000000000000000000000000002">βUSD</option>
+                    <option value="0x20c0000000000000000000000000000000000001">αUSD</option>
+                </select>
+                <div id="amountOutGroup" style="display: none; flex: 1;">
+                    <input type="number" id="amountOut" placeholder="0.00" step="0.000001">
+                </div>
+            </div>
+            <div id="toBalance" class="balance-display">Connect wallet to see balance</div>
+            <div id="quoteDisplay" class="quote-result"></div>
+        </div>
+
+        <div class="row">
+            <div class="input-group" style="flex: 1;">
+                <label>Order Type</label>
+                <select id="orderType">
+                    <option value="market">Market (Instant Swap)</option>
+                    <option value="limit">Limit (Set Price)</option>
+                </select>
+            </div>
+            <div id="marketModeGroup" class="input-group" style="flex: 1;">
+                <label>Market Mode</label>
+                <select id="marketMode">
+                    <option value="exactIn">Exact In</option>
+                    <option value="exactOut">Exact Out</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div id="limitPriceGroup" class="input-group" style="flex: 1; display: none;">
+                <label>Limit Price</label>
+                <input type="number" id="limitPrice" value="1.000000" step="0.000001">
+            </div>
+            <div id="slippageGroup" class="input-group" style="flex: 1;">
+                <label>Slippage %</label>
+                <input type="number" id="slippage" value="0.5" step="0.1">
+            </div>
+        </div>
+
+        <button class="main-btn btn-quote" id="quoteBtn">GET QUOTE</button>
+        <button class="main-btn btn-swap" id="swapBtn">PLACE ORDER</button>
+
+        <div id="status">Ready.</div>
+
+        <div id="docsSection" class="docs" style="display: none;">
+            <h2>NOIR SWAP – Quick Guide</h2>
+            <ul>
+                <li>Connect wallet & switch to Tempo Testnet (Chain ID 42429, RPC https://rpc.testnet.tempo.xyz)</li>
+                <li>Tokens: αUSD (0x20c...0001), βUSD (0x20c...0002) – 6 decimals</li>
+                <li>Market: Instant swap with slippage (default 0.5%)</li>
+                <li>Limit: Place orders at set price – may not fill instantly</li>
+                <li>Get test funds: docs.tempo.xyz/quickstart/faucet</li>
+                <li>Issues? Check https://explore.tempo.xyz or refresh page</li>
+            </ul>
+            <p>Minimal stablecoin swap on Tempo Testnet.</p>
+        </div>
+
+        <div class="footer">
+            &copy; 2026 NOIR SWAP. All rights reserved.
+        </div>
+    </div>
+
+    <script type="module">
+        import {
+            createPublicClient,
+            createWalletClient,
+            custom,
+            formatUnits,
+            parseUnits,
+            http,
+            encodeFunctionData
+        } from 'https://esm.sh/viem';
+
+        const RPC_URL = 'https://rpc.testnet.tempo.xyz';
+        const CHAIN_ID = 42429;
+        const DEX_ADDRESS = '0xdec0000000000000000000000000000000000000';
+        const EXPLORER = 'https://explore.tempo.xyz/tx/';
+        const DECIMALS = 6;
+
+        const DEX_ABI = [
+            {
+                "name": "quoteSwapExactAmountIn",
+                "type": "function",
+                "stateMutability": "view",
+                "inputs": [
+                    { "name": "inputToken", "type": "address" },
+                    { "name": "outputToken", "type": "address" },
+                    { "name": "amountIn", "type": "uint128" }
+                ],
+                "outputs": [{ "name": "amountOut", "type": "uint128" }]
+            },
+            {
+                "name": "quoteSwapExactAmountOut",
+                "type": "function",
+                "stateMutability": "view",
+                "inputs": [
+                    { "name": "inputToken", "type": "address" },
+                    { "name": "outputToken", "type": "address" },
+                    { "name": "amountOut", "type": "uint128" }
+                ],
+                "outputs": [{ "name": "amountIn", "type": "uint128" }]
+            },
+            {
+                "name": "swapExactAmountIn",
+                "type": "function",
+                "stateMutability": "nonpayable",
+                "inputs": [
+                    { "name": "inputToken", "type": "address" },
+                    { "name": "outputToken", "type": "address" },
+                    { "name": "amountIn", "type": "uint128" },
+                    { "name": "minAmountOut", "type": "uint128" }
+                ],
+                "outputs": [{ "name": "amountOut", "type": "uint128" }]
+            },
+            {
+                "name": "swapExactAmountOut",
+                "type": "function",
+                "stateMutability": "nonpayable",
+                "inputs": [
+                    { "name": "inputToken", "type": "address" },
+                    { "name": "outputToken", "type": "address" },
+                    { "name": "maxAmountIn", "type": "uint128" },
+                    { "name": "amountOut", "type": "uint128" }
+                ],
+                "outputs": [{ "name": "amountIn", "type": "uint128" }]
+            }
+        ];
+
+        // Specific ABI for encoding Actions (place is not exposed for direct simulate/call)
+        const PLACE_ABI = [{
+            "name": "place",
+            "type": "function",
+            "stateMutability": "nonpayable",
+            "inputs": [
+                { "name": "isBuy", "type": "bool" },
+                { "name": "price", "type": "uint256" },
+                { "name": "amount", "type": "uint128" },
+                { "name": "inputToken", "type": "address" },
+                { "name": "outputToken", "type": "address" }
+            ],
+            "outputs": []
+        }];
+
+        const TOKEN_ABI = [
+            {
+                name: 'balanceOf',
+                type: 'function',
+                stateMutability: 'view',
+                inputs: [{ name: 'account', type: 'address' }],
+                outputs: [{ name: '', type: 'uint256' }]
+            },
+            {
+                name: 'allowance',
+                type: 'function',
+                stateMutability: 'view',
+                inputs: [
+                    { name: 'owner', type: 'address' },
+                    { name: 'spender', type: 'address' }
+                ],
+                outputs: [{ name: '', type: 'uint256' }]
+            },
+            {
+                name: 'approve',
+                type: 'function',
+                stateMutability: 'nonpayable',
+                inputs: [
+                    { name: 'spender', type: 'address' },
+                    { name: 'amount', type: 'uint256' }
+                ],
+                outputs: [{ name: '', type: 'bool' }]
+            }
+        ];
+
+        let address = null;
+        let publicClient = createPublicClient({
+            chain: { id: CHAIN_ID, name: 'NOIR Testnet', nativeCurrency: { name: 'NOIR', symbol: 'NOIR', decimals: 18 }, rpcUrls: { default: { http: [RPC_URL] }, public: { http: [RPC_URL] } } },
+            transport: http()
+        });
+        let walletClient = null;
+
+        const connectBtn = document.getElementById('connectBtn');
+        const quoteBtn = document.getElementById('quoteBtn');
+        const swapBtn = document.getElementById('swapBtn');
+        const statusDiv = document.getElementById('status');
+        const quoteDisplay = document.getElementById('quoteDisplay');
+        const walletArea = document.getElementById('wallet-area');
+        const fromTokenSelect = document.getElementById('fromToken');
+        const toTokenSelect = document.getElementById('toToken');
+        const fromBalanceDiv = document.getElementById('fromBalance');
+        const toBalanceDiv = document.getElementById('toBalance');
+        const orderTypeSelect = document.getElementById('orderType');
+        const limitPriceGroup = document.getElementById('limitPriceGroup');
+        const slippageGroup = document.getElementById('slippageGroup');
+        const limitPriceInput = document.getElementById('limitPrice');
+        const slippageInput = document.getElementById('slippage');
+        const amountInInput = document.getElementById('amountIn');
+        const amountOutInput = document.getElementById('amountOut');
+        const amountOutGroup = document.getElementById('amountOutGroup');
+        const marketModeSelect = document.getElementById('marketMode');
+        const marketModeGroup = document.getElementById('marketModeGroup');
+        const maxBtn = document.getElementById('maxBtn');
+        let currentFromBalance = 0n;
+        let quoteTimeout = null;
+
+        function setStatus(msg, isError = false) {
+            statusDiv.innerText = msg;
+            statusDiv.style.color = isError ? '#f44' : 'var(--accent-4)';
+        }
+
+        async function connect() {
+            if (!window.ethereum) return setStatus("No wallet found.", true);
+            try {
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                address = accounts[0];
+                walletClient = createWalletClient({
+                    account: address,
+                    chain: { id: CHAIN_ID, name: 'NOIR Testnet', nativeCurrency: { name: 'NOIR', symbol: 'NOIR', decimals: 18 }, rpcUrls: { default: { http: [RPC_URL] }, public: { http: [RPC_URL] } } },
+                    transport: custom(window.ethereum)
+                });
+
+                const shortAddr = `${address.slice(0, 6)}...${address.slice(-4)}`;
+                walletArea.innerHTML = `<span class="address-display">${shortAddr}</span><button id="disconnectBtn" class="btn-disconnect" title="Disconnect">X</button>`;
+                document.getElementById('disconnectBtn').addEventListener('click', disconnect);
+                setStatus("Wallet connected.");
+
+                const isCorrectChain = await checkChain();
+                if (isCorrectChain) {
+                    fetchBalances();
+                    updateUIState();
+                }
+            } catch (e) {
+                setStatus(e.message, true);
+            }
+        }
+
+        function disconnect() {
+            address = null;
+            walletClient = null;
+            walletArea.innerHTML = '<button class="btn-connect" id="connectBtn">CONNECT</button>';
+            document.getElementById('connectBtn').addEventListener('click', connect);
+            setStatus("Wallet disconnected.");
+            document.getElementById('fromBalance').innerText = "Connect wallet to see balance";
+            document.getElementById('toBalance').innerText = "Connect wallet to see balance";
+            maxBtn.style.display = 'none';
+        }
+
+        async function checkChain() {
+            if (!walletClient) return false;
+            try {
+                const chainId = await walletClient.getChainId();
+                if (chainId !== CHAIN_ID) {
+                    setStatus(`Wrong network! Switch to NOIR Testnet (Chain ID ${CHAIN_ID})`, true);
+                    quoteBtn.disabled = true;
+                    swapBtn.disabled = true;
+                    statusDiv.innerHTML += `<br><button class="main-btn btn-swap" style="margin-top:10px;" id="switchChainBtn">SWITCH NETWORK</button>`;
+
+                    document.getElementById('switchChainBtn')?.addEventListener('click', async () => {
+                        try {
+                            setStatus("Switching network...");
+                            await walletClient.switchChain({ id: CHAIN_ID });
+                            // After switch, we should ideally trigger a refresh or re-check
+                            // Reload is the cleanest for a single file app
+                            window.location.reload();
+                        } catch (e) {
+                            setStatus("Switch failed: " + e.message, true);
+                        }
+                    });
+                    return false;
+                }
+                quoteBtn.disabled = false;
+                swapBtn.disabled = false;
+                return true;
+            } catch (e) {
+                console.error("Chain check failed", e);
+                return false;
+            }
+        }
+
+        async function updateUIState() {
+            if (!address) return;
+            const orderType = orderTypeSelect.value;
+            const marketMode = marketModeSelect.value;
+            const inputToken = fromTokenSelect.value;
+
+            // Sync labels and visibility
+            if (orderType === 'limit') {
+                limitPriceGroup.style.display = 'block';
+                slippageGroup.style.display = 'none';
+                marketModeGroup.style.display = 'none';
+                amountOutGroup.style.display = 'none';
+                amountInInput.parentElement.style.display = 'block';
+                swapBtn.innerText = "PLACE LIMIT ORDER";
+            } else {
+                limitPriceGroup.style.display = 'none';
+                slippageGroup.style.display = 'block';
+                marketModeGroup.style.display = 'block';
+                if (marketMode === 'exactIn') {
+                    amountOutGroup.style.display = 'none';
+                    amountInInput.parentElement.style.display = 'block';
+                } else {
+                    amountOutGroup.style.display = 'block';
+                    amountInInput.parentElement.style.display = 'none';
+                }
+                swapBtn.innerText = "SWAP NOW";
+            }
+
+            const amountInVal = amountInInput.value;
+            const amountOutVal = amountOutInput.value;
+
+            if (orderType === 'limit' || (orderType === 'market' && marketMode === 'exactIn')) {
+                if (!amountInVal || amountInVal <= 0) return;
+                try {
+                    const amountIn = parseUnits(amountInVal.toString(), DECIMALS);
+                    const allowance = await publicClient.readContract({
+                        address: inputToken,
+                        abi: TOKEN_ABI,
+                        functionName: 'allowance',
+                        args: [address, DEX_ADDRESS]
+                    });
+
+                    if (allowance < amountIn) {
+                        swapBtn.innerText = "APPROVE DEX";
+                    } else {
+                        // If allowance is sufficient, revert button text
+                        if (orderType === 'limit') {
+                            swapBtn.innerText = "PLACE LIMIT ORDER";
+                        } else {
+                            swapBtn.innerText = "SWAP NOW";
+                        }
+                    }
+                } catch (e) {
+                    console.error("Allowance check failed", e);
+                }
+            } else if (orderType === 'market' && marketMode === 'exactOut') {
+                // For exact out, we'll check allowance against a quoted value in swap() or just use a big amount
+                // For safety, let's just say if we need to check, we check after quote
+                swapBtn.innerText = "SWAP NOW";
+            }
+        }
+
+        async function fetchBalances() {
+            if (!address) return;
+
+            const fromToken = fromTokenSelect.value;
+            const toToken = toTokenSelect.value;
+            const fromSymbol = fromTokenSelect.options[fromTokenSelect.selectedIndex].text;
+            const toSymbol = toTokenSelect.options[toTokenSelect.selectedIndex].text;
+            maxBtn.style.display = 'inline';
+
+            fromBalanceDiv.innerText = "Balance: Loading...";
+            toBalanceDiv.innerText = "Balance: Loading...";
+
+            try {
+                const [fromBal, toBal] = await Promise.all([
+                    publicClient.readContract({
+                        address: fromToken,
+                        abi: TOKEN_ABI,
+                        functionName: 'balanceOf',
+                        args: [address]
+                    }),
+                    publicClient.readContract({
+                        address: toToken,
+                        abi: TOKEN_ABI,
+                        functionName: 'balanceOf',
+                        args: [address]
+                    })
+                ]);
+
+                currentFromBalance = fromBal;
+                fromBalanceDiv.innerText = `Balance: ${formatUnits(fromBal, DECIMALS)} ${fromSymbol}`;
+                toBalanceDiv.innerText = `Balance: ${formatUnits(toBal, DECIMALS)} ${toSymbol}`;
+            } catch (e) {
+                console.error(e);
+                fromBalanceDiv.innerText = "Balance: ??";
+                toBalanceDiv.innerText = "Balance: ??";
+            }
+        }
+
+        async function getQuote() {
+            const inputToken = fromTokenSelect.value;
+            const outputToken = toTokenSelect.value;
+            const marketMode = marketModeSelect.value;
+            const orderType = orderTypeSelect.value;
+
+            const isExactOut = orderType === 'market' && marketMode === 'exactOut';
+            const val = isExactOut ? amountOutInput.value : amountInInput.value;
+
+            if (!val || val <= 0) return setStatus("Enter amount.", true);
+
+            try {
+                setStatus("Fetching quote...");
+                const amount = parseUnits(val.toString(), DECIMALS);
+
+                const result = await publicClient.readContract({
+                    address: DEX_ADDRESS,
+                    abi: DEX_ABI,
+                    functionName: isExactOut ? 'quoteSwapExactAmountOut' : 'quoteSwapExactAmountIn',
+                    args: [inputToken, outputToken, amount]
+                });
+
+                const formatted = formatUnits(result, DECIMALS);
+                const toSymbol = toTokenSelect.options[toTokenSelect.selectedIndex].text;
+                const fromSymbol = fromTokenSelect.options[fromTokenSelect.selectedIndex].text;
+                const slippage = slippageInput.value;
+
+                if (isExactOut) {
+                    quoteDisplay.innerHTML = `You need ≈ <strong>${formatted} ${fromSymbol}</strong>`;
+                } else {
+                    let msg = `You will receive ≈ <strong>${formatted} ${toSymbol}</strong>`;
+                    if (orderType === 'market') msg += ` <small style="color:var(--accent-4)">(${slippage}% slippage protection)</small>`;
+                    quoteDisplay.innerHTML = msg;
+                }
+
+                setStatus("Quote received.");
+                fetchBalances();
+                return result;
+            } catch (e) {
+                console.error(e);
+                quoteDisplay.innerText = "";
+                if (e.message.includes("0xaa4bc69a")) {
+                    setStatus("Quote error: Invalid function on contract.", true);
+                } else if (e.message.includes("revert")) {
+                    setStatus("Quote failed: Insufficient liquidity.", true);
+                } else {
+                    setStatus("Quote error: " + e.message, true);
+                }
+                return null;
+            }
+        }
+
+        function autoQuote() {
+            clearTimeout(quoteTimeout);
+            quoteTimeout = setTimeout(() => {
+                const orderType = orderTypeSelect.value;
+                const marketMode = marketModeSelect.value;
+                const isExactOut = orderType === 'market' && marketMode === 'exactOut';
+                const val = isExactOut ? amountOutInput.value : amountInInput.value;
+
+                if (val > 0) {
+                    getQuote();
+                } else {
+                    quoteDisplay.innerHTML = "";
+                }
+            }, 500);
+        }
+
+        async function swap() {
+            if (!address) return setStatus("Connect wallet first.", true);
+
+            const inputToken = fromTokenSelect.value;
+            const outputToken = toTokenSelect.value;
+            const orderType = orderTypeSelect.value;
+            const marketMode = marketModeSelect.value;
+            const slippage = parseFloat(slippageInput.value || "0.5");
+
+            const isExactOut = orderType === 'market' && marketMode === 'exactOut';
+            const inputVal = isExactOut ? null : amountInInput.value;
+            const outputVal = isExactOut ? amountOutInput.value : null;
+
+            try {
+                let amountIn, amountOut;
+
+                if (isExactOut) {
+                    amountOut = parseUnits(outputVal.toString(), DECIMALS);
+                    const quotedIn = await getQuote();
+                    if (!quotedIn) return;
+                    // maxAmountIn = quotedIn * (1 + slippage/100)
+                    amountIn = (quotedIn * BigInt(Math.floor((100 + slippage) * 100))) / 10000n;
+                } else {
+                    amountIn = parseUnits(inputVal.toString(), DECIMALS);
+                }
+
+                // Check allowance
+                const allowance = await publicClient.readContract({
+                    address: inputToken,
+                    abi: TOKEN_ABI,
+                    functionName: 'allowance',
+                    args: [address, DEX_ADDRESS]
+                });
+
+                if (allowance < amountIn) {
+                    setStatus("Approving DEX...");
+                    const { request } = await publicClient.simulateContract({
+                        account: address,
+                        address: inputToken,
+                        abi: TOKEN_ABI,
+                        functionName: 'approve',
+                        args: [DEX_ADDRESS, parseUnits("1000000000", DECIMALS)]
+                    });
+                    const h = await walletClient.writeContract(request);
+                    await publicClient.waitForTransactionReceipt({ hash: h });
+                    setStatus("DEX Approved.");
+                    updateUIState();
+                }
+
+                setStatus("Preparing transaction...");
+                let hash;
+
+                if (orderType === 'market') {
+                    if (marketMode === 'exactIn') {
+                        const expectedOut = await getQuote();
+                        if (!expectedOut) return;
+                        const minAmountOut = (expectedOut * BigInt(Math.floor((100 - slippage) * 100))) / 10000n;
+
+                        const { request } = await publicClient.simulateContract({
+                            account: address,
+                            address: DEX_ADDRESS,
+                            abi: DEX_ABI,
+                            functionName: 'swapExactAmountIn',
+                            args: [inputToken, outputToken, amountIn, minAmountOut]
+                        });
+                        hash = await walletClient.writeContract(request);
+                    } else {
+                        // exactOut
+                        // amountIn here is maxAmountIn
+                        const { request } = await publicClient.simulateContract({
+                            account: address,
+                            address: DEX_ADDRESS,
+                            abi: DEX_ABI,
+                            functionName: 'swapExactAmountOut',
+                            args: [inputToken, outputToken, amountIn, amountOut]
+                        });
+                        hash = await walletClient.writeContract(request);
+                    }
+                } else {
+                    // Limit Order - Use Batch to avoid 0xaa4bc69a simulation error (SDK Action pattern)
+                    setStatus("Sending Batch Limit Order...");
+                    const priceVal = limitPriceInput.value;
+                    const price = parseUnits(priceVal.toString(), DECIMALS);
+
+                    const calls = [
+                        { to: inputToken, data: encodeFunctionData({ abi: TOKEN_ABI, functionName: 'approve', args: [DEX_ADDRESS, amountIn] }) },
+                        { to: DEX_ADDRESS, data: encodeFunctionData({ abi: PLACE_ABI, functionName: 'place', args: [true, price, amountIn, inputToken, outputToken] }) }
+                    ];
+
+                    hash = await walletClient.sendCalls({ calls });
+                }
+
+                setStatus(`Order Placed!`);
+                statusDiv.innerHTML += `<br><a href="${EXPLORER}${hash}" target="_blank" class="tx-link">View Transaction</a>`;
+                setTimeout(fetchBalances, 5000);
+            } catch (e) {
+                console.error(e);
+                setStatus("Swap error: " + e.message, true);
+            }
+        }
+
+        orderTypeSelect.addEventListener('change', () => {
+            updateUIState();
+            autoQuote();
+        });
+        marketModeSelect.addEventListener('change', () => {
+            updateUIState();
+            autoQuote();
+        });
+        amountInInput.addEventListener('input', () => {
+            updateUIState();
+            autoQuote();
+        });
+        amountOutInput.addEventListener('input', () => {
+            updateUIState();
+            autoQuote();
+        });
+        fromTokenSelect.addEventListener('change', () => {
+            fetchBalances();
+            updateUIState();
+            autoQuote();
+        });
+        toTokenSelect.addEventListener('change', () => {
+            fetchBalances();
+            updateUIState();
+            autoQuote();
+        });
+
+
+        connectBtn.addEventListener('click', connect);
+        quoteBtn.addEventListener('click', getQuote);
+        swapBtn.addEventListener('click', swap);
+        document.getElementById('docsBtn').addEventListener('click', () => {
+            const docs = document.getElementById('docsSection');
+            docs.style.display = 'block';
+            setTimeout(() => docs.scrollIntoView({ behavior: 'smooth', block: 'start' }), 10);
+        });
+
+        document.getElementById('flipTokens').addEventListener('click', () => {
+            const fromVal = fromTokenSelect.value;
+            const toVal = toTokenSelect.value;
+            fromTokenSelect.value = toVal;
+            toTokenSelect.value = fromVal;
+            fetchBalances();
+            updateUIState();
+            autoQuote();
+        });
+
+        maxBtn.addEventListener('click', () => {
+            if (currentFromBalance > 0n) {
+                amountInInput.value = formatUnits(currentFromBalance, DECIMALS);
+                updateUIState();
+            }
+        });
+
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', () => window.location.reload());
+            window.ethereum.on('chainChanged', () => window.location.reload());
+        }
+
+        if (window.ethereum && window.ethereum.selectedAddress) {
+            connect();
+        }
+    </script>
+
+</body>
+
+</html>
